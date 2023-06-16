@@ -29,16 +29,21 @@ const getExchangeRate = async (fromCurrency, toCurrency)=> {
 
 //use API to get the list of countries using toCurrency as their official currency
 const getCountries = async (toCurrency)=>{
-    const response = await axios.get(`http://api.countrylayer.com/v2/currency/${toCurrency}?access_key=b748212ae4e437c4c0b7c946eec05da2`);
-    return response.data.map(country=>country.name);
+    try{
+        const response = await axios.get(`http://api.countrylayer.com/v2/currency/${toCurrency}?access_key=b748212ae4e437c4c0b7c946eec05da2`);
+        return response.data.map(country=>country.name);
+    }catch (error){
+        throw new Error(`Unable to get countries that use ${toCurrency}`);
+    }
+    
 
 }
 
 //getCountries('usd');
 
 const ConvertCurrency = async (fromCurrency, toCurrency, amount)=>{
-    const exchangeRate = await getExchangeRate(fromCurrency, toCurrency);
     const countries = await getCountries(toCurrency);
+    const exchangeRate = await getExchangeRate(fromCurrency, toCurrency);
     const convertedAmount = (amount * exchangeRate).toFixed(2);
     return `${amount} ${fromCurrency} is worth ${convertedAmount} ${toCurrency}. You can spend these in the following countries: ${countries}`
 }
